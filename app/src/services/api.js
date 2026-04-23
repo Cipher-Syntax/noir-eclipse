@@ -1,0 +1,126 @@
+import axios from "axios";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { ACCESS_TOKEN, REFRESH_TOKEN } from "../constants/config";
+
+const api = axios.create({
+    baseURL: process.env.EXPO_PUBLIC_API_URL,
+    timeout: 30000,
+});
+
+if (!process.env.EXPO_PUBLIC_API_URL) {
+    console.warn('EXPO_PUBLIC_API_URL is not configured. API requests may fail.');
+}
+
+let tokenCache = null;
+let logoutInProgress = false;
+
+export function setLogoutInProgress(value) {
+    logoutInProgress = !!value;
+}
+
+export function setApiToken(token) {
+    tokenCache = token || null;
+
+    if (token) {
+        api.defaults.headers = api.defaults.headers || {};
+        api.defaults.headers.common = api.defaults.headers.common || {};
+        api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+    } else {
+        if (api.defaults?.headers?.common) {
+            delete api.defaults.headers.common['Authorization'];
+        }
+    }
+}
+
+api.interceptors.request.use(
+    async (config) => {
+        // Ensure headers object exists
+        config.headers = config.headers || {};
+
+        if (config.skipAuth) {
+            delete config.headers['Authorization'];
+            return config;
+        }
+
+        if (logoutInProgress) {
+            delete config.headers['Authorization'];
+            return config;
+        }
+
+        if (tokenCache) {
+            config.headers['Authorization'] = `Bearer ${tokenCache}`;
+        }
+        return config;
+    },
+    (error) => Promise.reject(error)
+);
+
+api.interceptors.response.use(
+    (response) => response,
+    async (error) => {
+        const originalRequest = error.config;
+
+        if (!originalRequest) {
+            return Promise.reject(error);
+        }
+
+        if (logoutInProgress) {
+            return Promise.reject(error);
+        }
+
+        if (originalRequest.skipAuth) {
+            return Promise.reject(error);
+        }
+
+
+        if (originalRequest.url && (originalRequest.url.includes('/token/') || originalRequest.url.includes('/login'))) {
+            return Promise.reject(error);
+        }
+
+        const isTokenInvalid =
+            error.response?.data?.code === 'token_not_valid' ||
+            (error.response?.status === 401 && !originalRequest._retry);
+
+        const isRefreshEndpoint = originalRequest.url?.includes('/api/token/refresh/');
+
+        if (isTokenInvalid && !originalRequest._retry && !isRefreshEndpoint) {
+            originalRequest._retry = true;
+
+            try {
+                const refresh = await AsyncStorage.getItem(REFRESH_TOKEN);
+                if (!refresh) {
+                    setApiToken(null);
+                    return Promise.reject(error);
+                }
+
+                const res = await api.post('/api/token/refresh/', { refresh });
+
+                const newAccess = res.data?.access;
+                if (!newAccess) throw new Error('No access token returned from refresh');
+
+                await AsyncStorage.setItem(ACCESS_TOKEN, newAccess);
+                setApiToken(newAccess);
+
+                originalRequest.headers = originalRequest.headers || {};
+                originalRequest.headers['Authorization'] = `Bearer ${newAccess}`;
+                
+                return api(originalRequest);
+            } 
+            catch (refreshError) {
+                try {
+                    await AsyncStorage.removeItem(ACCESS_TOKEN);
+                    await AsyncStorage.removeItem(REFRESH_TOKEN);
+                } catch (e) {
+                    console.log('Failed to clear storage: ', e);
+                }
+                setApiToken(null);
+                
+                return Promise.reject(refreshError);
+            }
+        }
+
+        return Promise.reject(error);
+    }
+);
+
+export default api;
