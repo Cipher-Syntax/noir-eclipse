@@ -46,6 +46,8 @@ INSTALLED_APPS = [
     'apps.authentication',
     'apps.users',
     'apps.movies',
+    'apps.cinemas',
+    'apps.movie_schedules',
     'apps.bookings',
     'apps.payments',
     
