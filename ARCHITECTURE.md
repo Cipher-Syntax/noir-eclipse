@@ -21,7 +21,7 @@ backend/
 ├── apps/
 │   ├── __init__.py
 │   │
-│   ├── users/
+│   ├── app_name/
 │   │   ├── models.py
 │   │   ├── serializers.py
 │   │   ├── views.py
@@ -33,7 +33,7 @@ backend/
 │   │   ├── tests/
 │   │   └── migrations/
 │   │
-│   ├── bookings/
+│   ├── app_name/
 │   │   ├── models.py
 │   │   ├── serializers.py
 │   │   ├── views.py
@@ -56,8 +56,12 @@ backend/
 │
 ├── static/
 ├── media/
-└── docs/
-    └── ARCHITECTURE.md
+└── docs/       
+    ├── FEATURES.md
+    ├── DECISIONS.md
+    ├── TODOS.md
+    └── BUGS.md
+
 ```
 
 ## 🌐 WEB (React + Tailwind)
@@ -88,21 +92,6 @@ src/
 │   │   │
 │   │   └── services/
 │   │       └── authService.js
-│   │
-│   ├── booking/
-│   │   ├── pages/
-│   │   │   └── BookingPage.jsx
-│   │   │
-│   │   ├── components/
-│   │   │   ├── BookingCard.jsx
-│   │   │   └── BookingForm.jsx
-│   │   │
-│   │   ├── hooks/
-│   │   │   └── useBookings.js
-│   │   │
-│   │   └── services/
-│   │       └── bookingService.js
-│
 ├── components/
 │   ├── ui/
 │   │   ├── Button.jsx
@@ -142,20 +131,20 @@ src/
 ```bash
 app/
 │
-├── _layout.tsx
-├── index.tsx
+├── _layout.js
+├── index.js
 │
 ├── auth/
-│   ├── login.tsx
-│   └── register.tsx
+│   ├── login.js
+│   └── register.js
 │
 ├── bookings/
-│   ├── index.tsx
-│   └── details.tsx
+│   ├── index.js
+│   └── details.js
 │
 └── (tabs)/
-    ├── home.tsx
-    └── profile.tsx
+    ├── home.js
+    └── profile.js
 
 
 src/
@@ -163,31 +152,21 @@ src/
 ├── features/
 │   ├── auth/
 │   │   ├── components/
-│   │   │   └── AuthForm.tsx
+│   │   │   └── AuthForm.js
 │   │   │
 │   │   ├── hooks/
-│   │   │   └── useAuth.ts
+│   │   │   └── useAuth.js
 │   │   │
 │   │   └── services/
-│   │       └── authService.ts
+│   │       └── authService.js
 │   │
-│   ├── bookings/
-│   │   ├── components/
-│   │   │   └── BookingCard.tsx
-│   │   │
-│   │   ├── hooks/
-│   │   │   └── useBookings.ts
-│   │   │
-│   │   └── services/
-│   │       └── bookingService.ts
-│
 ├── components/
 │   ├── ui/
-│   │   ├── Button.tsx
-│   │   └── Input.tsx
+│   │   ├── Button.js
+│   │   └── Input.js
 │   │
 │   └── common/
-│       └── Loader.tsx
+│       └── Loader.js
 │
 ├── services/
 │   └── api.ts
@@ -208,5 +187,10 @@ assets/
 ├── images/
 ├── icons/
 └── fonts/
+
+```
+```bash
+ARCHITECTURE.md
+GUIDELINES.md
 
 ```
