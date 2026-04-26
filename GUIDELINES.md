@@ -93,8 +93,9 @@ backend/
 ├── static/
 ├── media/
 └── docs/       
-    ├── FEATURES.md
+    ├── PROJECT-SPECIFIC-RULES.md
     ├── DECISIONS.md
+    ├── FEATURES.md
     ├── TODOS.md
     └── BUGS.md
 
