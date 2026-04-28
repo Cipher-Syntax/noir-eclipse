@@ -1,7 +1,12 @@
 import { View, Text, StyleSheet, ImageBackground } from "react-native";
 import { colors } from "../../src/constants/colors";
 import ScreenSafeArea from "../../src/components/common/ScreenSafeArea";
+import Button  from "../../src/components/ui/Button"
+import { router } from "expo-router"
 
+const handleRedirection = () => {
+    router.push("auth/login")
+}
 export default function LandingPage() {
     const logo = require("../../assets/icons/logo.png");
 
@@ -14,8 +19,10 @@ export default function LandingPage() {
                         Immerse in the Magic of Movies
                     </Text>
 
-                    
                 </View>
+
+                <Button title="Get Started" style={styles.getStartedButton} onPress={handleRedirection} />
+                    
                 {/* <ImageBackground
                     source={logo}
                     style={styles.background}
@@ -64,4 +71,7 @@ const styles = StyleSheet.create({
         fontWeight: "bold",
         textAlign: "center",
     },
+    getStartedButton: {
+        paddingHorizontal: 15,
+    }
 });
